@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     private Sprite player;
 
     private Rigidbody2D rb;
+    private Animator animator;
 
     private void Awake()
     {
@@ -27,9 +28,8 @@ public class Player : MonoBehaviour
 
         player = GetComponent<Sprite>();
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
 
-        
-        
     }
 
     // Update is called once per frame
@@ -60,19 +60,26 @@ public class Player : MonoBehaviour
         if (moveInputX != 0)
         {
             rb.linearVelocity = new Vector2(movement, rb.linearVelocityY);
+            animator.SetBool("walk", true);
         }
         else 
         {
-            rb.linearVelocity = new Vector2(Mathf.MoveTowards(rb.linearVelocity.x, 0, Deceleration * Time.deltaTime), rb.linearVelocityY);
+            float linearDeceleration = Mathf.MoveTowards(rb.linearVelocity.x, 0, Deceleration * Time.deltaTime);
+            rb.linearVelocity = new Vector2(linearDeceleration, rb.linearVelocityY);
+
+            if(linearDeceleration == 0) animator.SetBool("walk", false);
+
         }
 
         if (rb.linearVelocityX > MaxSpeed)
         {
             rb.linearVelocity = new Vector2(MaxSpeed, rb.linearVelocityY);
+            transform.eulerAngles = new Vector3(0,0,0);
         }
         else if (rb.linearVelocityX < -MaxSpeed) 
         { 
             rb.linearVelocity = new Vector2(-MaxSpeed, rb.linearVelocityY);
+            transform.eulerAngles = new Vector3(0, 180, 0);
         }
 
     }
@@ -85,6 +92,7 @@ public class Player : MonoBehaviour
             {
                 rb.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
                 dobleJumping = true;
+                animator.SetBool("double_jump", !dobleJumping);
             } 
             else 
             {
@@ -92,6 +100,7 @@ public class Player : MonoBehaviour
                 {
                     rb.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
                     dobleJumping = false;
+                    animator.SetBool("double_jump", !dobleJumping);
                 }
             }
         }
@@ -102,6 +111,8 @@ public class Player : MonoBehaviour
         if(collision.gameObject.layer == 6) 
         {
             isJumping = false;
+            dobleJumping = false;
+            animator.SetBool("jump", false);
         }
     }
 
@@ -110,6 +121,7 @@ public class Player : MonoBehaviour
         if (collision.gameObject.layer == 6)
         {
             isJumping = true;
+            animator.SetBool("jump", true);
         }
     }
 }
