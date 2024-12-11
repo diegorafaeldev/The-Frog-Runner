@@ -1,12 +1,13 @@
 using UnityEngine;
 
+
 public class Apple : MonoBehaviour
 {
 
     private SpriteRenderer spriteRenderer;
     private CircleCollider2D circleCollider;
     public GameObject collected;
-
+    public int Score;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,6 +29,9 @@ public class Apple : MonoBehaviour
             spriteRenderer.enabled = false;
             circleCollider.enabled = false;
             collected.SetActive(true);
+
+            GameController.instance.totalScore += Score;
+            GameController.instance.UpdateScoreText();
 
             Destroy(gameObject, 0.5f);
         }
